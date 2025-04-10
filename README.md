@@ -43,7 +43,7 @@ Or install with <b>python</b>:
 
 ```/s``` - enable/disable automatic audio playback
 
-```/*lang*``` - change language, default language is Chinese (Traditional), check <a href="https://github.com/duc11021102/pyspeech/releases/download/v1.0/pyspeech.exe" >this file<a/> to use
+```/*lang*``` - change language, default language is Chinese (Traditional), check <a href="https://github.com/duc11021102/pyspeech/blob/main/langs.py" >this file<a/> to use
 
 Example: ```/vi``` - change to Vietnamese
 
