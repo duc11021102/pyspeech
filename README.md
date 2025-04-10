@@ -13,7 +13,7 @@ What the program does?
 
 ## Quick start 
 
-<h4>The simplest method is to install the portable version using the .exe file, available at <a href="https://github.com/duc11021102/pyspeech/releases/download/v1.0/pyspeech.exe">this link</a>.
+<h4>The simplest method is to install the portable version using the .exe file, available at <a href="https://github.com/duc11021102/pyspeech/releases/download/v1.0/tts-audio.exe">this link</a>.
 <br>
 Or install with <b>python</b>:
 
