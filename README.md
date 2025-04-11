@@ -29,7 +29,7 @@ Or install with <b>python</b>:
   - Star this repository
   - <>Code > Download ZIP > Open cmd/terminal in that location
   - Run this command : `pip install -r requirements.txt`
-  - Run `main.py`
+  - Run `tts-audio.py`
 
 
 - If you want to build and creat a .exe program:
