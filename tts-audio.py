@@ -26,7 +26,7 @@ def command(cmd):
         default_lang = str(lang)
         print(f"Set current language to \033[92m{dict_langs[default_lang]}\033[0m successfully!!!")
     else:
-        print("\033[91mCannot find the language!\033[0m")
+        print("\033[91mInvalid command!\033[0m")
 
     start()
     return 0
@@ -39,9 +39,9 @@ def play_sound(path):
 
     while pygame.mixer.music.get_busy():
         time.sleep(0.1)
-
-def instruction():
-    print()
+    pygame.mixer.music.stop() #stop playing
+    pygame.mixer.quit() # release resources
+    return
 
 def start():
     user_text = input('Enter your text to get audio: ').strip()
