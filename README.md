@@ -37,6 +37,12 @@ Or install with <b>python</b>:
   - Run this command : `pyinstaller --onefile --icon=icon.ico  tts-audio.py`
   - Your .exe file in your generated dist folder
 
+### Setup with Docker
+
+- Pull and run:
+
+  - Run this command : `docker pull duc11021102/text-to-speech-audio`
+  - Run this command : `docker run -it duc11021102/text-to-speech-audio`
 
 ### Command 
 ```/c``` - check current language
