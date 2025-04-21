@@ -33,6 +33,7 @@ def command(cmd):
 
 
 def play_sound(path):
+    os.environ["SDL_AUDIODRIVER"] = "dummy"
     pygame.mixer.init()
     pygame.mixer.music.load(path)
     pygame.mixer.music.play()
