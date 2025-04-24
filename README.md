@@ -1,7 +1,8 @@
 ## PySpeech
 You can create mp3 file with text and gTTS library (Google Translate's text-to-speech API)
 
-<h4><p align="center"><img src="design.jpg" width="800"/></p></h4>
+<h4><p align="center"><img src="design/design-1.jpg" width="800"/></p></h4>
+<h4><p align="center"><img src="design/design-2.jpg" width="800"/></p></h4>
 
 ```
 What the program does? 
