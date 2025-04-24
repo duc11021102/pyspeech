@@ -4,76 +4,136 @@ import os, pygame, time
 import intro
 
 
+# declare global variable
 default_lang = 'zh-TW'
 dict_langs = langs.lang
 current_path = os.getcwd()
 playing = 1
+default_mode = 0
 
+# check environment and set dummy only once when program starts.
+try:
+    pygame.mixer.init()
+    pygame.mixer.quit()  # just test initialization, then shut down immediately
+except pygame.error:
+    os.environ["SDL_AUDIODRIVER"] = "dummy"
+    import pygame  # re-import after setting dummy (safe)
 
-def command(cmd):
-    global default_lang
-    global playing
-    lang = cmd[1:]
-    if cmd == '/c':
-        print(f"Current language is: \033[92m{dict_langs[default_lang]}\033[0m")
-    elif cmd == '/s':
-        playing = 1 - playing
-        if playing:
-            print("\033[92mSound on successfully\033[0m")
-        else:
-            print("\033[92mSound off successfully\033[0m")
-    elif str(lang) in dict_langs:
-        default_lang = str(lang)
-        print(f"Set current language to \033[92m{dict_langs[default_lang]}\033[0m successfully!!!")
-    else:
-        print("\033[91mInvalid command!\033[0m")
-
-    start()
-    return 0
-
+def safe_init_audio():
+    """
+    This function checks if the environment
+    can play sound to avoid errors.
+    If it doesn't play, run pygame with dummy env
+    """
+    try:
+        pygame.mixer.init()
+    except pygame.error as e:
+        os.environ["SDL_AUDIODRIVER"] = "dummy"
+        pygame.mixer.quit()
+        pygame.mixer.init()
 
 def play_sound(path):
-    os.environ["SDL_AUDIODRIVER"] = "dummy"
-    pygame.mixer.init()
+    """
+    This function play sound based on path
+    get_busy() avoid running loops too fast which wastes CPU.
+    :param path: str
+    :return: None
+    """
+    safe_init_audio()
     pygame.mixer.music.load(path)
     pygame.mixer.music.play()
-
     while pygame.mixer.music.get_busy():
         time.sleep(0.1)
     pygame.mixer.music.stop() #stop playing
-    pygame.mixer.quit() # release resources
+    pygame.mixer.quit() #release resource
     return
 
-def start():
-    user_text = input('Enter your text to get audio: ').strip()
-
-    if user_text.startswith('/'):
-        command(user_text)
-
-    print(f"Your text: \033[92m{user_text}\033[0m")
+def command(cmd):
+    """
+    This function handles commands from the user.
+    :param cmd: str
+    :return: 0
+    """
     global default_lang
-    tts = gTTS(text=user_text, lang=default_lang)
+    global playing
+    global default_mode
+    lang = cmd[1:]
 
-    index = 1
-    while True:
-        if not os.path.exists(f'audio_{index}.mp3'):
-            break
-        index +=1
+    if str(lang) in dict_langs:
+        default_lang = str(lang)
+        print(f"Set current language to \033[92m{dict_langs[default_lang]}\033[0m successfully!!!")
+    else:
+        match cmd:
+            case '/c':
+                print(f'Current language: \033[92m{default_lang} ({dict_langs[default_lang]})\033[0m')
+                print(f'Current mode: \033[92m{"One .mp3 file" if default_mode == 0 else "Multiple .mp3 files"}\033[0m')
+                print(f'Current sound mode: \033[92m{"On" if playing == 1 else "Off"}\033[0m')
+            case '/m':
+                default_mode = 1 - default_mode
+                if default_mode == 1:
+                    print(f"Set current mode to \033[92m{'Multiple .mp3 files'}\033[0m successfully!!!")
+                else:
+                    print(f"Set current mode to \033[92m{'One .mp3 file'}\033[0m successfully!!!")
+            case '/s':
+                playing = 1 - playing
+                if playing:
+                    print("\033[92mSound on successfully\033[0m")
+                else:
+                    print("\033[92mSound off successfully\033[0m")
+            case _:
+                print("\033[91mInvalid command!\033[0m")
+    return 0
 
+def start():
+    global default_lang
+    if default_mode == 0:
+        user_text = input('Enter your text to get audio: ').strip()
 
-    tts.save(f'audio_{index}.mp3')
-    file_path = os.path.join(current_path, f'audio_{index}.mp3')
-    print("Loading...")
-    if playing:
-        print("Playing...")
-        play_sound(file_path)
-    print("\033[92mGenerating successfully!!!\033[0m")
-    print(f"Your file path: {file_path}")
+        if user_text.startswith('/'):
+            command(user_text)
+            return start()
+
+        print(f"Your text: \033[92m{user_text}\033[0m")
+        tts = gTTS(text=user_text, lang=default_lang)
+
+        index = 1
+        while True:
+            if not os.path.exists(f'audio_{index}.mp3'):
+                break
+            index += 1
+
+        tts.save(f'audio_{index}.mp3')
+        file_path = os.path.join(current_path, f'audio_{index}.mp3')
+        print("Loading...")
+        if playing:
+            print("Playing...")
+            play_sound(file_path)
+        print("\033[92mGenerating successfully!!!\033[0m")
+        print(f"Your file path: {file_path}")
+
+    elif default_mode == 1:
+        file_path = input('Enter your .txt file path to generate audio: ').strip(" '\"")
+        if file_path.startswith('/'):
+            command(file_path)
+        if os.path.exists(file_path):
+            print(f"Your .txt file path: \033[92m{file_path}\033[0m")
+            name_file = os.path.splitext(os.path.basename(file_path))[0]
+            with open(file_path, 'r', encoding='utf-8') as f:
+                for index, line in enumerate(f):
+                    text = line.strip()
+                    print(f"Generating file {index + 1}: \033[92m{text}\033[0m")
+                    tts = gTTS(text=text, lang=default_lang)# remove line break character
+                    tts.save(f'{name_file}_{index + 1}.mp3')
+            print("\033[92mGenerating successfully!!!\033[0m")
+            print(f"Your all audio files are saved in: {os.getcwd()}")
+        else:
+            print("\033[91mYou entered an invalid path or not exists!\033[91m\033[0m")
     start()
 
 
 if __name__ == '__main__':
     intro.banner()
-    print(f'Current language: \033[92m{default_lang}\033[0m')
-    print('\033[92mSound On\033[0m' if playing else '\033[92mSound Off\033[0m')
+    print(f'Current language: \033[92m{default_lang} ({dict_langs[default_lang]})\033[0m')
+    print(f'Current mode: \033[92m{"One .mp3 file" if default_mode == 0 else "Multiple .mp3 files"}\033[0m')
+    print(f'Current sound mode: \033[92m{"On" if playing == 1 else "Off"}\033[0m')
     start()
