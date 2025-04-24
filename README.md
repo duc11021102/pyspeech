@@ -7,6 +7,7 @@ You can create mp3 file with text and gTTS library (Google Translate's text-to-s
 What the program does? 
 
 - Generate mp3 file with text
+- Generate multiple mp3 files through .txt file
 - Multilingual
 - A terminal windows program
 ``` 
@@ -45,6 +46,8 @@ Or install with <b>python</b>:
   - Run this command : `docker run -it duc11021102/text-to-speech-audio`
 
 ### Command 
+```/m``` - change mode (one .mp3 file or multiple .mp3 files)
+
 ```/c``` - check current language
 
 ```/s``` - enable/disable automatic audio playback
