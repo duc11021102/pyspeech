@@ -89,45 +89,53 @@ def start():
     if default_mode == 0:
         user_text = input('Enter your text to get audio: ').strip()
 
+        if len(user_text) == 0:
+            return start()
         if user_text.startswith('/'):
             command(user_text)
             return start()
 
         print(f"Your text: \033[92m{user_text}\033[0m")
-        tts = gTTS(text=user_text, lang=default_lang)
-
-        index = 1
-        while True:
-            if not os.path.exists(f'audio_{index}.mp3'):
-                break
-            index += 1
-
-        tts.save(f'audio_{index}.mp3')
-        file_path = os.path.join(current_path, f'audio_{index}.mp3')
-        print("Loading...")
-        if playing:
-            print("Playing...")
-            play_sound(file_path)
-        print("\033[92mGenerating successfully!!!\033[0m")
-        print(f"Your file path: {file_path}")
+        try:
+            tts = gTTS(text=user_text, lang=default_lang)
+            index = 1
+            while True:
+                if not os.path.exists(f'audio_{index}.mp3'):
+                    break
+                index += 1
+            tts.save(f'audio_{index}.mp3')
+            file_path = os.path.join(current_path, f'audio_{index}.mp3')
+            print("Loading...")
+            if playing:
+                print("Playing...")
+                play_sound(file_path)
+            print("\033[92mGenerating successfully!!!\033[0m")
+            print(f"Your file path: {file_path}")
+        except AssertionError as e:
+            print(f"\033[91mFile: Error ({e})\033[91m\033[0m")
 
     elif default_mode == 1:
         file_path = input('Enter your .txt file path to generate audio: ').strip(" '\"")
         if file_path.startswith('/'):
             command(file_path)
+            return start()
         if os.path.exists(file_path):
             print(f"Your .txt file path: \033[92m{file_path}\033[0m")
             name_file = os.path.splitext(os.path.basename(file_path))[0]
             with open(file_path, 'r', encoding='utf-8') as f:
                 for index, line in enumerate(f):
                     text = line.strip()
-                    print(f"Generating file {index + 1}: \033[92m{text}\033[0m")
-                    tts = gTTS(text=text, lang=default_lang)# remove line break character
-                    tts.save(f'{name_file}_{index + 1}.mp3')
+                    try:
+                        tts = gTTS(text=text, lang=default_lang)  # remove line break character
+                        print(f"Generating file {index + 1}: \033[92m{text}\033[0m")
+                        tts.save(f'{name_file}_{index + 1}.mp3')
+                    except AssertionError as e:
+                        print(f"\033[91mGenerating file {index + 1}: Error ({e})\033[91m\033[0m")
             print("\033[92mGenerating successfully!!!\033[0m")
             print(f"Your all audio files are saved in: {os.getcwd()}")
         else:
             print("\033[91mYou entered an invalid path or not exists!\033[91m\033[0m")
+    print("\n")
     start()
 
 
