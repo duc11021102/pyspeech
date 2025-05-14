@@ -1,6 +1,6 @@
 from gtts import gTTS
 import langs
-import os, pygame, time
+import os, pygame, time, sys, signal
 import intro
 
 
@@ -10,6 +10,13 @@ dict_langs = langs.lang
 current_path = os.getcwd()
 playing = 1
 default_mode = 0
+
+# smooth Ctrl C, avoid error commands as exit
+def smooth_exit(signal, frame):
+    print("\n")
+    print("\nProgram exiting gracefully!!!")
+    sys.exit(0)
+signal.signal(signal.SIGINT, smooth_exit)
 
 # check environment and set dummy only once when program starts.
 try:
