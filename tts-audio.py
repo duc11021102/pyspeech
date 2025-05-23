@@ -2,14 +2,40 @@ from gtts import gTTS
 import langs
 import os, pygame, time, sys, signal
 import intro
+from enum import Enum
 
+# declare classes
+class SoundState(Enum):
+    PLAYING = 1
+    PAUSE = 0
+
+    def toggle(self):
+        """
+        This function turn off or turn on
+        sound mode
+        :param self
+        :return: state
+        """
+        return SoundState.PAUSE if self == SoundState.PLAYING else SoundState.PLAYING
+
+class ModeState(Enum):
+    DEFAULT_MODE = 0
+    MULTIPLE_MODE = 1
+
+    def toggle(self):
+        """
+        This function switch mode
+        :param self
+        :return: state
+        """
+        return ModeState.MULTIPLE_MODE if self == ModeState.DEFAULT_MODE else ModeState.DEFAULT_MODE
 
 # declare global variable
 default_lang = 'zh-TW'
 dict_langs = langs.lang
 current_path = os.getcwd()
-playing = 1
-default_mode = 0
+playing = SoundState.PLAYING
+mode = ModeState.DEFAULT_MODE
 
 # smooth Ctrl C, avoid error commands as exit
 def smooth_exit(signal, frame):
@@ -63,7 +89,7 @@ def command(cmd):
     """
     global default_lang
     global playing
-    global default_mode
+    global mode
     lang = cmd[1:]
 
     if str(lang) in dict_langs:
@@ -72,18 +98,18 @@ def command(cmd):
     else:
         match cmd:
             case '/c':
-                print(f'Current language: \033[92m{default_lang} ({dict_langs[default_lang]})\033[0m')
-                print(f'Current mode: \033[92m{"One .mp3 file" if default_mode == 0 else "Multiple .mp3 files"}\033[0m')
-                print(f'Current sound mode: \033[92m{"On" if playing == 1 else "Off"}\033[0m')
+                print(f'[+] Current language: \033[92m{default_lang} ({dict_langs[default_lang]})\033[0m')
+                print(f'[+] Current mode: \033[92m{"One .mp3 file" if mode == ModeState.DEFAULT_MODE else "Multiple .mp3 files"}\033[0m')
+                print(f'[+] Current sound mode: \033[92m{"On" if playing == SoundState.PLAYING else "Off"}\033[0m')
             case '/m':
-                default_mode = 1 - default_mode
-                if default_mode == 1:
+                mode = mode.toggle()
+                if mode == ModeState.MULTIPLE_MODE:
                     print(f"Set current mode to \033[92m{'Multiple .mp3 files'}\033[0m successfully!!!")
                 else:
                     print(f"Set current mode to \033[92m{'One .mp3 file'}\033[0m successfully!!!")
             case '/s':
-                playing = 1 - playing
-                if playing:
+                playing = playing.toggle()
+                if playing == SoundState.PLAYING:
                     print("\033[92mSound on successfully\033[0m")
                 else:
                     print("\033[92mSound off successfully\033[0m")
@@ -93,7 +119,7 @@ def command(cmd):
 
 def start():
     global default_lang
-    if default_mode == 0:
+    if mode == ModeState.DEFAULT_MODE:
         user_text = input('Enter your text to get audio: ').strip()
 
         if len(user_text) == 0:
@@ -113,7 +139,7 @@ def start():
             tts.save(f'audio_{index}.mp3')
             file_path = os.path.join(current_path, f'audio_{index}.mp3')
             print("Loading...")
-            if playing:
+            if playing == SoundState.PLAYING:
                 print("Playing...")
                 play_sound(file_path)
             print("\033[92mGenerating successfully!!!\033[0m")
@@ -121,7 +147,7 @@ def start():
         except AssertionError as e:
             print(f"\033[91mFile: Error ({e})\033[91m\033[0m")
 
-    elif default_mode == 1:
+    elif mode == ModeState.MULTIPLE_MODE:
         file_path = input('Enter your .txt file path to generate audio: ').strip(" '\"")
         if file_path.startswith('/'):
             command(file_path)
@@ -148,7 +174,7 @@ def start():
 
 if __name__ == '__main__':
     intro.banner()
-    print(f'Current language: \033[92m{default_lang} ({dict_langs[default_lang]})\033[0m')
-    print(f'Current mode: \033[92m{"One .mp3 file" if default_mode == 0 else "Multiple .mp3 files"}\033[0m')
-    print(f'Current sound mode: \033[92m{"On" if playing == 1 else "Off"}\033[0m')
+    print(f'[+] Current language: \033[92m{default_lang} ({dict_langs[default_lang]})\033[0m')
+    print(f'[+] Current mode: \033[92m{"One .mp3 file" if mode == ModeState.DEFAULT_MODE else "Multiple .mp3 files"}\033[0m')
+    print(f'[+] Current sound mode: \033[92m{"On" if playing == SoundState.PLAYING else "Off"}\033[0m')
     start()
