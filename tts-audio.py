@@ -1,34 +1,13 @@
+from sre_parse import State
+
 from gtts import gTTS
 import langs
-import os, pygame, time, sys, signal
+import os, pygame, signal
 import intro
 from enum import Enum
-
-# declare classes
-class SoundState(Enum):
-    PLAYING = 1
-    PAUSE = 0
-
-    def toggle(self):
-        """
-        This function turn off or turn on
-        sound mode
-        :param self
-        :return: state
-        """
-        return SoundState.PAUSE if self == SoundState.PLAYING else SoundState.PLAYING
-
-class ModeState(Enum):
-    DEFAULT_MODE = 0
-    MULTIPLE_MODE = 1
-
-    def toggle(self):
-        """
-        This function switch mode
-        :param self
-        :return: state
-        """
-        return ModeState.MULTIPLE_MODE if self == ModeState.DEFAULT_MODE else ModeState.DEFAULT_MODE
+from lib import exit
+from lib import sound
+from model.State import SoundState, ModeState
 
 # declare global variable
 default_lang = 'zh-TW'
@@ -38,11 +17,7 @@ playing = SoundState.PLAYING
 mode = ModeState.DEFAULT_MODE
 
 # smooth Ctrl C, avoid error commands as exit
-def smooth_exit(signal, frame):
-    print("\n")
-    print("\nProgram exiting gracefully!!!")
-    sys.exit(0)
-signal.signal(signal.SIGINT, smooth_exit)
+signal.signal(signal.SIGINT, exit.smooth_exit)
 
 # check environment and set dummy only once when program starts.
 try:
@@ -51,35 +26,6 @@ try:
 except pygame.error:
     os.environ["SDL_AUDIODRIVER"] = "dummy"
     import pygame  # re-import after setting dummy (safe)
-
-def safe_init_audio():
-    """
-    This function checks if the environment
-    can play sound to avoid errors.
-    If it doesn't play, run pygame with dummy env
-    """
-    try:
-        pygame.mixer.init()
-    except pygame.error as e:
-        os.environ["SDL_AUDIODRIVER"] = "dummy"
-        pygame.mixer.quit()
-        pygame.mixer.init()
-
-def play_sound(path):
-    """
-    This function play sound based on path
-    get_busy() avoid running loops too fast which wastes CPU.
-    :param path: str
-    :return: None
-    """
-    safe_init_audio()
-    pygame.mixer.music.load(path)
-    pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy():
-        time.sleep(0.1)
-    pygame.mixer.music.stop() #stop playing
-    pygame.mixer.quit() #release resource
-    return
 
 def command(cmd):
     """
@@ -141,7 +87,7 @@ def start():
             print("Loading...")
             if playing == SoundState.PLAYING:
                 print("Playing...")
-                play_sound(file_path)
+                sound.play_sound(file_path)
             print("\033[92mGenerating successfully!!!\033[0m")
             print(f"Your file path: {file_path}")
         except AssertionError as e:

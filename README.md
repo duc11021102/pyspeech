@@ -21,7 +21,7 @@ Or install with <b>python</b>:
 
 ### Requirements
 
-* Python
+* Python (pip v25 or newer, python v3.10 or newer)
 * Python Libraries: `gTTS pygame pyinstaller colorama`
 
 ### Setup 
