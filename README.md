@@ -22,7 +22,7 @@ Or install with <b>python</b>:
 ### Requirements
 
 * Python (pip v25 or newer, python v3.10 or newer)
-* Python Libraries: `gTTS pygame pyinstaller colorama`
+* Python Libraries: `gTTS pygame pyinstaller`
 
 ### Setup 
 
@@ -31,7 +31,7 @@ Or install with <b>python</b>:
   - Star this repository
   - <>Code > Download ZIP > Open cmd/terminal in that location
   - Run this command : `pip install -r requirements.txt`
-  - Run `tts-audio.py`
+  - Run `tts-audio.py` or open `tts-audio.bat` after installation
 
 
 - If you want to build and creat a .exe program:
