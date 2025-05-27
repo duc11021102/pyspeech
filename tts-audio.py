@@ -1,20 +1,18 @@
-from sre_parse import State
-
 from gtts import gTTS
 import langs
 import os, pygame, signal
 import intro
-from enum import Enum
 from lib import exit
 from lib import sound
 from model.State import SoundState, ModeState
+from typing import Dict
 
 # declare global variable
-default_lang = 'zh-TW'
-dict_langs = langs.lang
-current_path = os.getcwd()
-playing = SoundState.PLAYING
-mode = ModeState.DEFAULT_MODE
+default_lang: str = 'zh-TW'
+dict_langs: Dict[str, str] = langs.lang
+current_path: str = os.getcwd()
+playing: SoundState = SoundState.PLAYING
+mode: ModeState = ModeState.DEFAULT_MODE
 
 # smooth Ctrl C, avoid error commands as exit
 signal.signal(signal.SIGINT, exit.smooth_exit)
@@ -27,7 +25,7 @@ except pygame.error:
     os.environ["SDL_AUDIODRIVER"] = "dummy"
     import pygame  # re-import after setting dummy (safe)
 
-def command(cmd):
+def command(cmd : str) -> int:
     """
     This function handles commands from the user.
     :param cmd: str
@@ -36,7 +34,7 @@ def command(cmd):
     global default_lang
     global playing
     global mode
-    lang = cmd[1:]
+    lang: str = cmd[1:]
 
     if str(lang) in dict_langs:
         default_lang = str(lang)
@@ -63,7 +61,7 @@ def command(cmd):
                 print("\033[91mInvalid command!\033[0m")
     return 0
 
-def start():
+def start() -> None:
     global default_lang
     if mode == ModeState.DEFAULT_MODE:
         user_text = input('Enter your text to get audio: ').strip()
@@ -76,7 +74,7 @@ def start():
 
         print(f"Your text: \033[92m{user_text}\033[0m")
         try:
-            tts = gTTS(text=user_text, lang=default_lang)
+            tts: gTTS = gTTS(text=user_text, lang=default_lang)
             index = 1
             while True:
                 if not os.path.exists(f'audio_{index}.mp3'):
@@ -94,7 +92,7 @@ def start():
             print(f"\033[91mFile: Error ({e})\033[91m\033[0m")
 
     elif mode == ModeState.MULTIPLE_MODE:
-        file_path = input('Enter your .txt file path to generate audio: ').strip(" '\"")
+        file_path: str = input('Enter your .txt file path to generate audio: ').strip(" '\"")
         if file_path.startswith('/'):
             command(file_path)
             return start()

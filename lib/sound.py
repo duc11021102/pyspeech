@@ -13,7 +13,7 @@ def safe_init_audio():
         pygame.mixer.quit()
         pygame.mixer.init()
 
-def play_sound(path):
+def play_sound(path: str):
     """
     This function play sound based on path
     get_busy() avoid running loops too fast which wastes CPU.
