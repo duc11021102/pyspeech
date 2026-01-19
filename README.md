@@ -44,7 +44,7 @@ Or install with <b>python</b>:
 - Pull and run:
 
   - Run this command : `docker pull duc11021102/text-to-speech-audio`
-  - Run this command : `docker run -it duc11021102/text-to-speech-audio`
+  - Run this command : `docker run --name tts -it duc11021102/text-to-speech-audio`
 
 ### Command 
 ```/m``` - change mode (one .mp3 file or multiple .mp3 files)
